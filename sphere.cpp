@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <cstring>
+#include <utility>
 #include <unistd.h>
 
 struct Vec3
@@ -16,16 +17,19 @@ int main()
     Vec3 lightNormal = { 0.0, -1.0, 0.0 };
     float t = 0.0f;
 
-    std::array<std::array<char, 2 * R>, R> framebuffer;
-    memset(framebuffer.data(), ' ', sizeof(framebuffer));
+    // First element of pair is dot product of surface normal and light normal
+    // Second element is depth value
+    std::array<std::array<std::pair<char, char>, 2 * R>, R> framebuffer;
+
     for(;;usleep(16000), t+=0.02)
     {
         lightNormal.x = sin(t);
         lightNormal.y = cos(t);
+        std::fill(&framebuffer[0][0], &framebuffer[0][0] + 2 * R * R, std::make_pair(' ', (char)0));
 
-        for(float phi = 0.0; phi < 2.0 * M_PI; phi += 0.01)
+        for(float phi = 0.0; phi < 2.0 * M_PI; phi += 0.02)
         {
-            for(float theta = -M_PI / 2; theta < M_PI / 2; theta += 0.01)
+            for(float theta = 0; theta < 2.0 * M_PI; theta += 0.02)
             {
                 // Coordiantes of sphere
                 // In this case since origin is the centre of sphere, surface normal = coordianate
@@ -37,14 +41,15 @@ int main()
                 char charIndex = (int) (x * lightNormal.x + y * lightNormal.y + z * lightNormal.z);
                 charIndex = 6 * (charIndex + R) / R;
 
-                framebuffer[(z + R)/2][x + R] = *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex));
+                if(framebuffer[(z + R) / 2][x + R].second < y)
+                    framebuffer[(z + R)/2][x + R] = { *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex)), y };
             }
         }
         printf("\x1b[2J");
         printf("\x1b[H");
         for(const auto& rows: framebuffer) {
             for(const auto& x: rows) {
-                printf("%c", x);
+                printf("%c", x.first);
             }
             printf("\n");
         }
