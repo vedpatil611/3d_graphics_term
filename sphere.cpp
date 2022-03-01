@@ -23,9 +23,11 @@ int main()
 
     for(;;usleep(16000), t+=0.02)
     {
+        std::fill(&framebuffer[0][0], &framebuffer[0][0] + 2 * R * R, std::make_pair(' ', (char)0));
+        
+        // Rotating light normal
         lightNormal.x = sin(t);
         lightNormal.y = cos(t);
-        std::fill(&framebuffer[0][0], &framebuffer[0][0] + 2 * R * R, std::make_pair(' ', (char)0));
 
         for(float phi = 0.0; phi < 2.0 * M_PI; phi += 0.02)
         {
@@ -39,10 +41,10 @@ int main()
             
                 // Transforming data from range[ -R , R ] to range[ 0, 12 ]
                 char charIndex = (int) (x * lightNormal.x + y * lightNormal.y + z * lightNormal.z);
-                charIndex = 6 * (charIndex + R) / R;
+                charIndex = characters.size() - 1 - 6 * (charIndex + R) / R;
 
                 if(framebuffer[(z + R) / 2][x + R].second < y)
-                    framebuffer[(z + R)/2][x + R] = { *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex)), y };
+                    framebuffer[(z + R) / 2][x + R] = { *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex)), y };
             }
         }
         printf("\x1b[2J");
@@ -54,6 +56,5 @@ int main()
             printf("\n");
         }
     }
-    // usleep(20000);
     return 0;
 }
