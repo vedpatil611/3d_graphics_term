@@ -1,7 +1,6 @@
 #include <array>
 #include <iostream>
 #include <cmath>
-#include <cstring>
 #include <utility>
 #include <unistd.h>
 
@@ -14,18 +13,19 @@ int main()
 {
     const std::array<char, 12> characters = { '.', ',', '-', '~', ':', ';', '=', '!', '*', '#', '$', '@' };
     const int R = 30;
+    const int PADDING = 4;
 
     Vec3 lightNormal = { 0.0, 0.0, 0.0 };
     float t = 0.0f;
 
     // First element of pair is dot product of surface normal and light normal
     // Second element is depth value
-    std::array<std::array<std::pair<char, char>, 2 * R>, R> framebuffer;
+    std::array<std::array<std::pair<char, char>, 2 * (R + PADDING)>, R + PADDING> framebuffer;
 
     for(;;usleep(16000), t+=0.02)
     {
         // Clearing the buffer
-        std::fill(&framebuffer[0][0], &framebuffer[0][0] + 2 * R * R, std::make_pair(' ', (char)-100));
+        std::fill(&framebuffer[0][0], &framebuffer[0][0] + 2 * (R + PADDING) * (R + PADDING), std::make_pair(' ', (char)-100));
         
         // Rotating light normal
         lightNormal.x = sin(t);
@@ -42,11 +42,11 @@ int main()
                 float z = (float) R * sin(theta) * sin(phi);
             
                 // Transforming data from range[ -R , R ] to range[ 12, 0 ]
-                char charIndex = (int) (x * lightNormal.x + y * lightNormal.y + z * lightNormal.z);
+                char charIndex = (char) (x * lightNormal.x + y * lightNormal.y + z * lightNormal.z);
                 charIndex = characters.size() - 1 - 6 * (charIndex + R) / R;
 
-                if(framebuffer[(y + R) / 2][x + R].second < z)
-                    framebuffer[(y + R) / 2][x + R] = { *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex)), z };
+                if(framebuffer[(y + R + PADDING) / 2][x + R + PADDING].second < z)
+                    framebuffer[(y + R + PADDING) / 2][x + R + PADDING] = { *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex)), z };
             }
         }
         printf("\x1b[2J");
