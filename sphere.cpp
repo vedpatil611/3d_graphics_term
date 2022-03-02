@@ -14,7 +14,8 @@ int main()
 {
     const std::array<char, 12> characters = { '.', ',', '-', '~', ':', ';', '=', '!', '*', '#', '$', '@' };
     const int R = 30;
-    Vec3 lightNormal = { 0.0, -1.0, 0.0 };
+
+    Vec3 lightNormal = { 0.0, 0.0, 0.0 };
     float t = 0.0f;
 
     // First element of pair is dot product of surface normal and light normal
@@ -23,11 +24,12 @@ int main()
 
     for(;;usleep(16000), t+=0.02)
     {
-        std::fill(&framebuffer[0][0], &framebuffer[0][0] + 2 * R * R, std::make_pair(' ', (char)0));
+        // Clearing the buffer
+        std::fill(&framebuffer[0][0], &framebuffer[0][0] + 2 * R * R, std::make_pair(' ', (char)-100));
         
         // Rotating light normal
         lightNormal.x = sin(t);
-        lightNormal.y = cos(t);
+        lightNormal.z = cos(t);
 
         for(float phi = 0.0; phi < 2.0 * M_PI; phi += 0.02)
         {
@@ -39,12 +41,12 @@ int main()
                 float y = (float) R * cos(theta);
                 float z = (float) R * sin(theta) * sin(phi);
             
-                // Transforming data from range[ -R , R ] to range[ 0, 12 ]
+                // Transforming data from range[ -R , R ] to range[ 12, 0 ]
                 char charIndex = (int) (x * lightNormal.x + y * lightNormal.y + z * lightNormal.z);
                 charIndex = characters.size() - 1 - 6 * (charIndex + R) / R;
 
-                if(framebuffer[(z + R) / 2][x + R].second < y)
-                    framebuffer[(z + R) / 2][x + R] = { *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex)), y };
+                if(framebuffer[(y + R) / 2][x + R].second < z)
+                    framebuffer[(y + R) / 2][x + R] = { *(characters.rbegin() + (charIndex > 0 ? charIndex : -charIndex)), z };
             }
         }
         printf("\x1b[2J");
