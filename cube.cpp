@@ -8,7 +8,6 @@
     for(float x = -H_LEN; x < H_LEN; x += 0.2)              \
         for (float y = -H_LEN; y < H_LEN; y += 0.2)
 
-const std::array<char, 12> characters = { '.', ',', '-', '~', ':', ';', '=', '!', '*', '#', '$', '@' };
 const int LEN = 32;
 const int H_LEN = LEN / 2;
 const int PADDING = LEN;

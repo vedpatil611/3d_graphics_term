@@ -7,7 +7,6 @@
 
 int main()
 {
-    const std::array<char, 12> characters = { '.', ',', '-', '~', ':', ';', '=', '!', '*', '#', '$', '@' };
     const int R = 30;
     const int PADDING = 4;
 
