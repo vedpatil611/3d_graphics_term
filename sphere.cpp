@@ -3,11 +3,7 @@
 #include <cmath>
 #include <utility>
 #include <unistd.h>
-
-struct Vec3
-{
-    float x, y, z;
-};
+#include "utils.h"
 
 int main()
 {

@@ -2,18 +2,14 @@
 #include <iostream>
 #include <cmath>
 #include <unistd.h>
+#include "utils.h"
 
 #define ITER_2D(x,y)                                        \
     for(float x = -H_LEN; x < H_LEN; x += 0.2)              \
         for (float y = -H_LEN; y < H_LEN; y += 0.2)
 
-struct Vec3
-{
-    float x, y, z;
-};
-
 const std::array<char, 12> characters = { '.', ',', '-', '~', ':', ';', '=', '!', '*', '#', '$', '@' };
-const int LEN = 20;
+const int LEN = 32;
 const int H_LEN = LEN / 2;
 const int PADDING = LEN;
 
@@ -39,9 +35,19 @@ Vec3 rotateY(const Vec3& vec, float angle)
     return res;
 }
 
-constexpr float deg2rad(float degree)
+// Optimized combined equation for x and y rotation
+Vec3 rotateXY(const Vec3& vec, float x, float y)
 {
-    return degree * M_PI / 180.0; 
+    float ca = cos(y);
+    float sa = sin(y);
+    float ct = cos(x);
+    float st = sin(x);
+    
+    Vec3 res;
+    res.x = ca * vec.x + vec.z * sa;
+    res.y = st * sa * vec.x + ct * vec.y - st * ca * vec.z;
+    res.z = - ct * sa * vec.x + st * vec.y + ct * ca * vec.z;
+    return res;
 }
 
 void draw(const Vec3& pos, const Vec3& normal)
@@ -70,34 +76,37 @@ int main()
         ITER_2D(x, y)
         {
             float z = -H_LEN;
-            Vec3 norm = rotateX(rotateY({0,0,-1}, yRot), xRot);
-            draw(rotateX(rotateY({x,y,z}, yRot), xRot), norm);
-
+            Vec3 norm = rotateXY({0,0,-1}, xRot, yRot);
+            draw(rotateXY({x,y,z}, xRot, yRot), norm);
+            
             z = H_LEN;
-            norm = rotateX(rotateY({0,0,1}, yRot), xRot);
-            draw(rotateX(rotateY({x,y,z}, yRot), xRot), norm);
+            norm = rotateXY({0,0,1}, xRot, yRot);
+            draw(rotateXY({x,y,z}, xRot, yRot), norm);
         }
         
         ITER_2D(y, z)
         {
             float x = -H_LEN;
-            Vec3 norm = rotateX(rotateY({-1,0,0}, yRot), xRot);
-            draw(rotateX(rotateY({x,y,z}, yRot), xRot), norm);
+            Vec3 norm = rotateXY({-1,0,0}, xRot, yRot);
+            draw(rotateXY({x,y,z}, xRot, yRot), norm);
  
             x = H_LEN;
-            norm = rotateX(rotateY({1,0,0}, yRot), xRot);
-            draw(rotateX(rotateY({x,y,z}, yRot), xRot), norm);
+            norm = rotateXY({1,0,0}, xRot, yRot);
+            draw(rotateXY({x,y,z}, xRot, yRot), norm);
         }
         
         ITER_2D(x, z)
         {
             float y = -H_LEN;
-            Vec3 norm = rotateX(rotateY({0,-1,0}, yRot), xRot);
-            draw(rotateX(rotateY({x,y,z}, yRot), xRot), norm);
+            Vec3 norm = rotateXY({0,-1,0}, xRot, yRot);
+            draw(rotateXY({x,y,z}, xRot, yRot), norm);
  
             y = H_LEN;
-            norm = rotateX(rotateY({0,1,0}, yRot), xRot);
+            // This draw call is not required because bottom surface is never rendered
+            // Vec3 norm = rotateXY({0,1,0}, xRot, yRot);
+            // draw(rotateXY({x,y,z}, xRot, yRot), norm);
         }
+
         printf("\x1b[2J");
         printf("\x1b[H");
         for(const auto& rows: framebuffer) {
