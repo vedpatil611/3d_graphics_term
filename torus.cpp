@@ -5,7 +5,7 @@
 
 #include "utils.h"
 
-const int R = 25;
+const int R = 20;
 const int r = 10;
 const int PADDING = 4;
 
@@ -20,9 +20,9 @@ int main()
     {
         std::fill(&buffer[0][0], &buffer[0][0] + 2 * (R + r + PADDING) * (R + r + PADDING), std::make_pair(' ', (char) -100));
 
-        for(float theta = 0.0f; theta < M_PI * 2; theta += 0.02f)
+        for(float theta = 0.0f; theta < M_PI * 2; theta += 0.03f)
         {
-            for(float phi = 0.0f; phi < M_PI * 2; phi += 0.02f)
+            for(float phi = 0.0f; phi < M_PI * 2; phi += 0.03f)
             {
                 float st = sin(theta);
                 float ct = cos(theta);

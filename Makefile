@@ -1,7 +1,7 @@
-SRC = cube.cpp sphere.cpp torus.cpp
+SRC = cube.cpp sphere.cpp torus.cpp pyramid.cpp
 OBJ = $(SRC:.cpp=.o)
 
-all: cube sphere torus
+all: cube sphere torus pyramid
 
 .cpp.o:
 	g++ -c -Wall -O3 $<
@@ -15,6 +15,9 @@ sphere: sphere.o
 torus: torus.o
 	g++ torus.o -o torus
 
+pyramid: pyramid.o
+	g++ pyramid.o -o pyramid
+	
 clean:
-	rm -f cube sphere torus $(OBJ)
+	rm -f cube sphere torus pyramid $(OBJ)
 
